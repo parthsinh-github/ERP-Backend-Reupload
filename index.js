@@ -26,21 +26,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(compression());
 
-const allowedOrigins = [
-  'http://localhost:5173',
- 'https://college-erp-tech.netlify.app'
-];
 
+// ✅ CORS Configuration (Updated)
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin like mobile apps or curl
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true
+  origin: ['http://localhost:5173',
+     'https://college-erp-tech.netlify.app'],
+  credentials: true,
 }));
+
+// ✅ Handle Preflight (OPTIONS) requests
+
+app.options('*', cors());
 
 // Routes
 app.use("/api/v1/users", userRoutes);
