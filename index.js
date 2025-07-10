@@ -7,7 +7,6 @@ import compression from 'compression';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-
 // Routes
 import userRoutes from "./routes/user.js";
 import announcementRoutes from "./routes/announcement.js";
@@ -25,22 +24,21 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(compression()); // Already present? ✅ Then you're fine.
+app.use(compression());
 
+// ✅ Fixed: CORS configuration
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://illustrious-souffle-cdf961.netlify.app'
+];
 
-
-const corsOptions = {
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true,
-};
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 // Routes
-// app.use("/api/v1/faculty", facultyRoutes);
 app.use("/api/v1/users", userRoutes);
-// app.use("/api/v1/admin", adminRoutes);
-// app.use("/api/v1/student", studentRoutes);
-// app.use("/api/v1/staff", staffRoutes);
 app.use("/api/v1/announcement", announcementRoutes);
 app.use("/api/v1/leave", leaveRoutes);
 app.use("/api/v1/exam", examRoutes);
@@ -48,7 +46,7 @@ app.use("/api/v1/report", reportRoutes);
 app.use("/api/v1/id-card", idCardRoutes);
 app.use("/api/v1/document", documentRoutes);
 
-// Serve frontend (in production)
+// Serve frontend (optional - only if needed in production)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -61,8 +59,8 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Server start
-const PORT = process.env.PORT || 8080;
+// Start server
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, async () => {
   try {
