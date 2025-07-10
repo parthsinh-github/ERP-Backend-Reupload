@@ -2,9 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { User } from "../models/user.js";
-import Otp from "../models/Otp.js"; // adjust the path if needed
 
-// import sendOtpMail from "../utils/mailService.js"; // your mailer function
 dotenv.config();
 
 const generateToken = (user) => {
@@ -59,8 +57,6 @@ export const registerUser = async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
 
     const user = new User({
       fullName,
@@ -82,19 +78,6 @@ export const registerUser = async (req, res) => {
 
     const token = generateToken(user);
 
-        
-    await Otp.create({
-      email,
-      otp: otpCode,
-      expiresAt: Date.now() + 5 * 60 * 1000,
-    });
-    await sendOtpMail(email, otpCode);
-
-    res.status(201).json({
-      success: true,
-      message: "User registered. Please verify OTP sent to email.",
-    });
-
     res.status(201).json({
       success: true,
       message: "Registration successful",
@@ -115,11 +98,6 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ email, role }); // Check role to prevent mismatches
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid credentials" });
-    }
-
-      // 🛑 Check if user has verified OTP
-    if (!user.isVerified) {
-      return res.status(403).json({ success: false, message: "Please verify your email with OTP" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
