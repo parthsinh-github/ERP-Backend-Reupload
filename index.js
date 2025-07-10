@@ -28,7 +28,7 @@ app.use(compression());
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://illustrious-souffle-cdf961.netlify.app'
+ 'https://college-erp-tech.netlify.app'
 ];
 
 app.use(cors({
