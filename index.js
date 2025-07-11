@@ -27,10 +27,18 @@ app.use(cookieParser());
 app.use(compression());
 
 
+// Allow frontend origin
+const allowedOrigins = ['https://college-erp-tech.netlify.app'];
+
 // ✅ CORS Configuration (Updated)
 app.use(cors({
-  origin: ['http://localhost:5173',
-     'https://college-erp-tech.netlify.app'],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 
