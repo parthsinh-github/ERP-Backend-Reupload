@@ -28,7 +28,7 @@ app.use(compression());
 
 
 // Allow frontend origin
-const allowedOrigins = ['https://college-erp-tech.netlify.app'];
+const allowedOrigins = ['https://college-erp-tech.netlify.app', 'http://localhost:5173'];
 
 // ✅ CORS Configuration (Updated)
 app.use(cors({
