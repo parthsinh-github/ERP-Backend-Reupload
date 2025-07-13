@@ -1,4 +1,4 @@
-import express from 'express';
+import express from 'express'; 
 import { connectDB } from './utils/db.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
@@ -26,25 +26,23 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(compression());
 
-
-// Allow frontend origin
-const allowedOrigins = ['https://college-erp-tech.netlify.app', 'http://localhost:5173'];
-
-// ✅ CORS Configuration (Updated)
+// ✅ CORS Setup (Netlify only)
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: ['https://college-erp-tech.netlify.app'],
   credentials: true,
 }));
 
-// ✅ Handle Preflight (OPTIONS) requests
-
+// ✅ Preflight Handling (OPTIONS)
 app.options('*', cors());
+
+// ✅ Optional fallback CORS headers (helps with stubborn hosting issues)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://college-erp-tech.netlify.app");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  next();
+});
 
 // Routes
 app.use("/api/v1/users", userRoutes);
@@ -55,7 +53,7 @@ app.use("/api/v1/report", reportRoutes);
 app.use("/api/v1/id-card", idCardRoutes);
 app.use("/api/v1/document", documentRoutes);
 
-// Serve frontend (optional - only if needed in production)
+// Serve frontend (optional)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
