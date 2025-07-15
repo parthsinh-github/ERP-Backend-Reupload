@@ -1,42 +1,55 @@
 import { Report } from "../models/report.js";
+import { User } from "../models/user.js"; // ✅ named export from your user model
 
-// Create a new report
 export const createReport = async (req, res) => {
   try {
-    const { studentId, adminId, type, title, description } = req.body;
+    const { adminId } = req.params;
+    const { studentId, type, title, description, status, dateIssued } = req.body;
 
-    if (!studentId || !adminId || !type || !title) {
+    if (!adminId) {
       return res.status(400).json({
         success: false,
-        message: "Student ID, Admin ID, Type and Title are required.",
+        message: "Admin ID is required in the URL.",
       });
     }
 
-    const report = await Report.create({
+    // Check if this user exists and is an admin
+    const admin = await User.findById(adminId);
+    if (!admin || admin.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only valid admins can create reports.",
+      });
+    }
+
+    const report = new Report({
       studentId,
       adminId,
       type,
       title,
       description,
+      status: status || "Pending",
+      dateIssued: dateIssued || new Date(),
     });
+
+    await report.save();
 
     res.status(201).json({
       success: true,
-      message: "Report created successfully.",
+      message: "Report created successfully",
       data: report,
     });
   } catch (error) {
-    console.error("Report creation error:", error);
+    console.error("Create report error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
-// Get all reports
 export const getAllReports = async (req, res) => {
   try {
     const reports = await Report.find()
-      .populate("studentId", "fullName enrollmentNumber")
-      .populate("adminId", "fullName email");
+      .populate("studentId", "fullName enrollmentNumber role")
+      .populate("adminId", "fullName email role");
 
     res.status(200).json({
       success: true,
