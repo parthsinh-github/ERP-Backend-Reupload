@@ -3,7 +3,8 @@ import { createReport, getAllReports } from "../controllers/report.js";
 
 const router = express.Router();
 
-router.post("/create", createReport);       // Create a new report
+router.post("/:adminId/create", createReport);   // Create a new report
+
 router.get("/all", getAllReports);          // Get all reports
 
 export default router;
